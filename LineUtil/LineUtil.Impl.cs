@@ -39,6 +39,8 @@ public partial class LineUtil
 
         try
         {
+            
+
             Point startPt = startPointSelection.GetSelectedObjects().FirstOrDefault() as Point;
             Point endPt = endPointSelection.GetSelectedObjects().FirstOrDefault() as Point;
 
@@ -74,6 +76,7 @@ public partial class LineUtil
 
             theSession.UpdateManager.DoUpdate(undoMark);
             //theSession.DeleteUndoMark(undoMark, "LineUtil");
+            //theSession.DisplayManager.MakeUpToDate();
         }
         catch (Exception ex)
         {

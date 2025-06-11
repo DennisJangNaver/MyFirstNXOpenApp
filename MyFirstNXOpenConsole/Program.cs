@@ -2,6 +2,8 @@
 using NXOpen.UF;
 using System;
 
+#if DEMO
+
 public class Program
 {
     // class members
@@ -78,3 +80,6 @@ public class Program
 
 
 }
+
+
+#endif

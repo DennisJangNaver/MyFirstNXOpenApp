@@ -1,6 +1,10 @@
 ﻿using NXOpen;
+using NXOpen.Assemblies;
 using NXOpen.UF;
 using System;
+using System.Linq;
+
+#if TEST
 
 public class Program
 {
@@ -42,29 +46,36 @@ public class Program
             theProgram = new Program();
 
             //TODO: Add your application code here 
-            PartLoadStatus loadStatus;
-            Part part = theSession.Parts.Open(@"C:\Siemens\NX2406\UGOPEN\SampleNXOpenApplications\DotNet\AssemblyViewer\toycar_wheel.prt", out loadStatus);
-            if(loadStatus.NumberUnloadedParts > 0)
+            PartLoadStatus loadStatus = null;
+            Part part = null;
+            try
             {
-                //
-            }
+                part = theSession.Parts.Open(@"C:\Siemens\NX2406\UGOPEN\SampleNXOpenApplications\DotNet\AssemblyViewer\toycar_assy.prt", out loadStatus);
+                if (loadStatus.NumberUnloadedParts > 0)
+                {
+                    foreach (int index in Enumerable.Range(0, loadStatus.NumberUnloadedParts))
+                    {
+                        String unloadedPart = loadStatus.GetPartName(index);
+                        Console.WriteLine(String.Format("Part '{0}' unloaded.", unloadedPart));
+                    }
 
-            if(loadStatus != null) 
-                loadStatus.Dispose();
+                    return 1;
+                }
+            }
+            finally
+            {
+                if (loadStatus != null)
+                    loadStatus.Dispose();
+            }
 
             if(part != null)
             {
-                foreach(Expression expression in part.Expressions)
-                {
-                    String message = expression.Name + " = " + expression.RightHandSide;
-                    theSession.LogFile.WriteLine(message);
-                    Console.WriteLine(message);
-                }
-                
+                PrintAssembly(part);
+
                 PartCloseResponses response = theSession.Parts.NewPartCloseResponses();
                 theSession.Parts.CloseAll(BasePart.CloseModified.CloseModified, response);
                 response.Dispose();
-            }            
+            }
         }
         catch (NXOpen.NXException ex)
         {
@@ -77,6 +88,40 @@ public class Program
                 theProgram.Dispose();
         }
         return retValue;
+    }
+
+    private static void PrintAssembly(Part part)
+    {
+        Component rootComponent = part.ComponentAssembly.RootComponent;
+        if (rootComponent != null)
+        {
+            PrintComponent(rootComponent);
+        }
+    }
+
+    private static void PrintComponent(Component component)
+    {
+        Part part = component.Prototype as Part;
+        String componentInfo = String.Format("{0} => {1}", component.Name, part.Name);
+        Console.WriteLine(componentInfo);
+        PrintExpressions(part);
+
+        Component[] childComponents = component.GetChildren();
+        for (int i = 0; i < childComponents.Length; i++)
+        {
+            Component childComponent = childComponents[i];
+            PrintComponent(childComponent);
+        }
+    }
+
+    private static void PrintExpressions(Part part)
+    {
+        foreach (Expression expression in part.Expressions)
+        {
+            String message = expression.Name + " = " + expression.RightHandSide;
+            theSession.LogFile.WriteLine(message);
+            Console.WriteLine(message);
+        }
     }
 
 
@@ -102,3 +147,5 @@ public class Program
 
 
 }
+
+#endif
