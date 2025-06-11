@@ -4,7 +4,7 @@ using NXOpen.UF;
 using System;
 using System.Linq;
 
-#if TEST
+#if !DEMO
 
 public class Program
 {
