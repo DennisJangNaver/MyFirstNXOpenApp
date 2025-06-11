@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using NXOpen;
 using NXOpen.BlockStyler;
+using NXOpen.Features;
 using static NXOpen.Session;
 
 public partial class LineUtil
@@ -38,13 +39,38 @@ public partial class LineUtil
 
         try
         {
-            Point start = startPointSelection.GetSelectedObjects().FirstOrDefault() as Point;
-            Point end = endPointSelection.GetSelectedObjects().FirstOrDefault() as Point;
+            Point startPt = startPointSelection.GetSelectedObjects().FirstOrDefault() as Point;
+            Point endPt = endPointSelection.GetSelectedObjects().FirstOrDefault() as Point;
 
-            Line newLine = theSession.Parts.Work.Curves.CreateLine(start, end);
-            newLine.SetName(this.nameInput.Value);
+            //Line newLine = theSession.Parts.Work.Curves.CreateLine(start, end);
+            //newLine.SetName(this.nameInput.Value);
+            //newLine.RedisplayObject();
+            //Create Line Builder
+            var workPart = theSession.Parts.Work;
+            AssociativeLine lineFeature = null;
+            var lineBuilder = workPart.BaseFeatures.CreateAssociativeLineBuilder(lineFeature);
 
-            
+            //Set parameter
+            lineBuilder.Associative = true;
+            lineBuilder.StartPointOptions = AssociativeLineBuilder.StartOption.Point;
+            lineBuilder.StartPoint.Value = startPt;
+
+            lineBuilder.EndPointOptions = AssociativeLineBuilder.EndOption.Point;
+            lineBuilder.EndPoint.Value = endPt;
+
+            //Commit and Clear Resource
+            AssociativeLine result = lineBuilder.Commit() as AssociativeLine;
+            lineBuilder.Destroy();
+
+            result.SetName(this.nameInput.Value);
+
+            NXObject[] items = result.GetEntities();
+            if (items.Length > 0)
+            {
+                NXObject item = items[0];
+                Line line = (Line)item;
+                line.SetName(this.nameInput.Value);
+            }
 
             theSession.UpdateManager.DoUpdate(undoMark);
             //theSession.DeleteUndoMark(undoMark, "LineUtil");
