@@ -35,6 +35,7 @@
 //These imports are needed for the following template code
 //------------------------------------------------------------------------------
 using System;
+using System.Diagnostics;
 using NXOpen;
 using NXOpen.BlockStyler;
 
@@ -145,6 +146,8 @@ public partial class LineUtil
     //------------------------------------------------------------------------------
     public LineUtil()
     {
+        Debugger.Launch();
+
         try
         {
             theSession = Session.GetSession();
