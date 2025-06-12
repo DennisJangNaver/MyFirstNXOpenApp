@@ -1,4 +1,5 @@
 ﻿using NXOpen;
+using NXOpen.Assemblies;
 using NXOpen.UF;
 using System;
 
@@ -44,9 +45,19 @@ public class Program
             theProgram = new Program();
 
             //TODO: Add your application code here
+            Console.WriteLine("Good NX Open External!!!");
 
-      
-           
+            String fileName = @"C:\Siemens\NX2406\UGOPEN\SampleNXOpenApplications\DotNet\AssemblyViewer\toycar_assy.prt";
+            PartLoadStatus loadStatus = null;
+            Part part = theSession.Parts.Open(fileName, out loadStatus);
+
+            if (loadStatus.NumberUnloadedParts > 0)
+            {
+                
+            }
+
+            Component topAssy = part.ComponentAssembly.RootComponent;
+            PrintComponent(topAssy);            
 
             theProgram.Dispose();
         }
@@ -56,6 +67,29 @@ public class Program
 
         }
         return retValue;
+    }
+
+    static void PrintComponent(Component component)
+    {
+        //Component Info.....
+        Part part = component.Prototype as Part;
+
+        Console.WriteLine(component.Name + " ==> " + part.Name);
+        PrintExpression(part);
+
+        Component[] children = component.GetChildren();
+        foreach (Component child in children)
+        {
+            PrintComponent(child);
+        }
+    }
+
+    static void PrintExpression(Part part)
+    {
+        foreach (Expression expr in part.Expressions)
+        {
+            Console.WriteLine(expr.Name + " = " + expr.RightHandSide);
+        }
     }
 
 
