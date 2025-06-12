@@ -59,6 +59,8 @@ public class Program
             Component topAssy = part.ComponentAssembly.RootComponent;
             PrintComponent(topAssy);            
 
+            //
+
             theProgram.Dispose();
         }
         catch (NXOpen.NXException ex)

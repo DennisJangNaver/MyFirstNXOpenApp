@@ -122,7 +122,6 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>copy $(TargetPath) "C:\Siemens\NXCustom\MyFirstApp\application"</PostBuildEvent>
   </PropertyGroup>
 </Project>
