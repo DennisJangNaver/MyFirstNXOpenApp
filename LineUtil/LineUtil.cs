@@ -146,8 +146,11 @@ public partial class LineUtil
     //------------------------------------------------------------------------------
     public LineUtil()
     {
+#if DEBUGGER
+
         Debugger.Launch();
 
+#endif
         try
         {
             theSession = Session.GetSession();

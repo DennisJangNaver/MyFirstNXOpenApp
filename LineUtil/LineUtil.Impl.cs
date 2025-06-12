@@ -99,7 +99,12 @@ public partial class LineUtil
 
         builder.Direction = direction;
 
-        Feature feature = builder.CommitFeature();
+        Extrude feature = builder.CommitFeature() as Extrude;
+        Body[] bodies = feature.GetBodies();
+        foreach(Body body in bodies)
+        {
+            body.SetName("Body by Extrude by Open API");
+        }
 
         builder.Destroy();
         section.Destroy();
